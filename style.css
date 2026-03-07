@@ -52,22 +52,37 @@ body{
   filter: brightness(0.95);
   color:#fff;
 }
-
 .product-card{
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 18px;
   overflow: hidden;
+  background-color: #fff;
   transition: transform .15s ease, box-shadow .15s ease;
-  background: #fff;
 }
+
+.product-card img{
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  object-position: center;
+  padding: 12px;
+  display: block;
+}
+
 .product-card:hover{
   transform: translateY(-3px);
   box-shadow: 0 12px 30px rgba(0,0,0,0.10);
 }
-.product-card img{
-  object-fit: cover;
-  height: 220px;
+
+.carousel-item{
+  height: 350px;
+}
+
+.carousel-item img{
   width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 .price{
   font-weight: 700;
