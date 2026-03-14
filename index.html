@@ -66,13 +66,13 @@
             <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" aria-label="Featured product carousel">
               <div class="carousel-inner rounded-4">
                 <div class="carousel-item active">
-                  <img src="iphone.jpg" class="d-block w-100" alt="Smartphone product photo">
+                  <img src="./assets/iphone.jpg" class="d-block w-100" alt="Smartphone product photo">
                 </div>
                 <div class="carousel-item">
-                  <img src="macbook.jpg" class="d-block w-100" alt="Laptop product photo">
+                  <img src="./assets/Macbook.jpg" class="d-block w-100" alt="Laptop product photo">
                 </div>
                 <div class="carousel-item">
-                  <img src="apple watch.jpg" class="d-block w-100" alt="Smartwatch product photo">
+                  <img src="./assets/apple watch.jpg" class="d-block w-100" alt="Smartwatch product photo">
                 </div>
               </div>
               <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Previous">
@@ -181,7 +181,7 @@
       <div class="mt-4 p-4 bg-white border rounded-4">
         <div class="row g-3 align-items-center">
           <div class="col-lg-8">
-            <h5 class="fw-semibold mb-1">Apple Store (real-world)</h5>
+            <h5 class="fw-semibold mb-1">Apple Store example (real-world)</h5>
             <p class="mb-0 text-muted">
               Apple’s online store includes order tracking and editing, shipping updates, and self-service help —
               a good example of how an official website improves customer experience.
@@ -453,23 +453,22 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // ------- Data -------
     const PRODUCTS = [
       {
         id: "phone",
-        name: "IPhone 17 pro max",
-        category: "IPhone",
+        name: "iPhone",
+        category: "Phone",
         price: 5999,
-        img: "iphone.jpg",
+        img: "./assets/iphone.jpg",
         tag: "New",
         desc: "A modern smartphone with powerful performance, advanced camera features, and premium design."
       },
       {
         id: "laptop",
         name: "MacBook",
-        category: "Macbook",
+        category: "Laptop",
         price: 7899,
-        img: "macbook.jpg",
+        img: "./assets/macbook.jpg",
         tag: "Popular",
         desc: "A lightweight and powerful laptop suitable for students, office work, and creative tasks."
       },
@@ -478,7 +477,7 @@
         name: "Apple Watch",
         category: "Watch",
         price: 299,
-        img: "apple watch.jpg",
+        img: "./assets/apple watch.jpg",
         tag: "Fitness",
         desc: "A smart watch that helps users track fitness, health, notifications, and daily activities."
       },
@@ -487,7 +486,7 @@
         name: "Wireless Earbuds",
         category: "Audio",
         price: 199,
-        img: "earbuds.jpg",
+        img: "./assets/earbuds.jpg",
         tag: "Best value",
         desc: "Wireless earbuds with clear sound quality, comfortable fit, and easy Bluetooth connection."
       },
@@ -496,26 +495,44 @@
         name: "USB-C Adapter",
         category: "Accessories",
         price: 29,
-        img: "adapter.jpg",
+        img: "./assets/adapter.jpg",
         tag: "Essential",
         desc: "A compact USB-C adapter used to connect devices such as USB drives, HDMI displays, and other accessories."
       }
     ];
 
-    // ------- Render -------
     const productGrid = document.getElementById("productGrid");
     const searchInput = document.getElementById("searchInput");
     const sortSelect = document.getElementById("sortSelect");
+
+    let cart = [];
+    const cartCount = document.getElementById("cartCount");
+    const cartItems = document.getElementById("cartItems");
+    const cartSubtotal = document.getElementById("cartSubtotal");
+
+    const toastEl = document.getElementById("appToast");
+    const toastBody = document.getElementById("toastBody");
+    const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
 
     function money(n) {
       return "RM" + n.toLocaleString();
     }
 
+    function showToast(msg) {
+      toastBody.textContent = msg;
+      toast.show();
+    }
+
     function renderProducts(list) {
       productGrid.innerHTML = "";
+
       list.forEach(p => {
+        const item = cart.find(x => x.id === p.id);
+        const qty = item ? item.qty : 0;
+
         const col = document.createElement("div");
         col.className = "col-sm-6 col-lg-4 col-xl-3";
+
         col.innerHTML = `
           <div class="product-card h-100">
             <img src="${p.img}" alt="${p.name}">
@@ -527,29 +544,35 @@
                 </div>
                 <span class="badge badge-soft rounded-pill">${p.tag}</span>
               </div>
+
               <div class="d-flex justify-content-between align-items-center mt-3">
                 <div class="price">${money(p.price)}</div>
-                <div class="btn-group">
-                  <button class="btn btn-outline-dark btn-sm" data-action="details" data-id="${p.id}">
-                    Details
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <button class="btn btn-outline-dark btn-sm" data-action="details" data-id="${p.id}">
+                  Details
+                </button>
+
+                <div class="btn-group align-items-center">
+                  <button class="btn btn-outline-dark btn-sm" data-action="minus" data-id="${p.id}">
+                    -
                   </button>
+
+                  <span class="px-2 fw-semibold">${qty}</span>
+
                   <button class="btn btn-brand btn-sm" data-action="add" data-id="${p.id}">
-                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                    +
                   </button>
                 </div>
               </div>
             </div>
           </div>
         `;
+
         productGrid.appendChild(col);
       });
     }
-
-    // ------- Cart logic -------
-    let cart = [];
-    const cartCount = document.getElementById("cartCount");
-    const cartItems = document.getElementById("cartItems");
-    const cartSubtotal = document.getElementById("cartSubtotal");
 
     function updateCartUI() {
       cartCount.textContent = cart.reduce((s, i) => s + i.qty, 0);
@@ -562,19 +585,26 @@
       }
 
       cartItems.innerHTML = "";
+
       cart.forEach(item => {
         const row = document.createElement("div");
         row.className = "d-flex gap-3 align-items-center";
+
         row.innerHTML = `
           <img src="${item.img}" alt="${item.name}" class="rounded-3 border" style="width:64px;height:64px;object-fit:cover">
+
           <div class="flex-grow-1">
             <div class="fw-semibold">${item.name}</div>
-            <div class="text-muted small">${money(item.price)} • Qty: ${item.qty}</div>
+            <div class="text-muted small">${money(item.price)}</div>
           </div>
-          <button class="btn btn-outline-dark btn-sm" aria-label="Remove ${item.name}" data-action="remove" data-id="${item.id}">
-            <i class="bi bi-dash-lg" aria-hidden="true"></i>
-          </button>
+
+          <div class="btn-group align-items-center">
+            <button class="btn btn-outline-dark btn-sm" data-action="remove" data-id="${item.id}">-</button>
+            <span class="px-2 fw-semibold">${item.qty}</span>
+            <button class="btn btn-outline-dark btn-sm" data-action="add" data-id="${item.id}">+</button>
+          </div>
         `;
+
         cartItems.appendChild(row);
       });
     }
@@ -584,6 +614,7 @@
       if (!p) return;
 
       const existing = cart.find(x => x.id === id);
+
       if (existing) {
         existing.qty += 1;
       } else {
@@ -591,6 +622,7 @@
       }
 
       updateCartUI();
+      applyFilters();
       showToast(`${p.name} added to cart`);
     }
 
@@ -599,19 +631,13 @@
       if (idx < 0) return;
 
       cart[idx].qty -= 1;
-      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+
+      if (cart[idx].qty <= 0) {
+        cart.splice(idx, 1);
+      }
 
       updateCartUI();
-    }
-
-    // ------- Interactions -------
-    const toastEl = document.getElementById("appToast");
-    const toastBody = document.getElementById("toastBody");
-    const toast = new bootstrap.Toast(toastEl, { delay: 2000 });
-
-    function showToast(msg) {
-      toastBody.textContent = msg;
-      toast.show();
+      applyFilters();
     }
 
     productGrid.addEventListener("click", (e) => {
@@ -623,6 +649,10 @@
 
       if (action === "add") {
         addToCart(id);
+      }
+
+      if (action === "minus") {
+        removeFromCart(id);
       }
 
       if (action === "details") {
@@ -652,12 +682,19 @@
       const id = btn.getAttribute("data-id");
       const action = btn.getAttribute("data-action");
 
-      if (action === "remove") removeFromCart(id);
+      if (action === "add") {
+        addToCart(id);
+      }
+
+      if (action === "remove") {
+        removeFromCart(id);
+      }
     });
 
     document.getElementById("clearCartBtn").addEventListener("click", () => {
       cart = [];
       updateCartUI();
+      applyFilters();
       showToast("Cart cleared");
     });
 
@@ -703,7 +740,6 @@
     searchInput.addEventListener("input", applyFilters);
     sortSelect.addEventListener("change", applyFilters);
 
-    // Initial
     renderProducts(PRODUCTS);
     updateCartUI();
   </script>
