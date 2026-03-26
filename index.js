@@ -15,7 +15,7 @@ const PRODUCTS = [
     name: "MacBook",
     category: "Laptop",
     price: 7899,
-    img: "Macbook.jpg",
+    img: "macbook.jpg",
     tag: "Popular",
     desc: "A lightweight and powerful laptop."
   },
